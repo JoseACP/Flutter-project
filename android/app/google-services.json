@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "763741896107",
+    "project_id": "mobil-practice",
+    "storage_bucket": "mobil-practice.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:763741896107:android:c753529b155d4c31cf26ee",
+        "android_client_info": {
+          "package_name": "com.example.ui_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6bRDiDtIotvYcp8VOya4fmgqdjId_1o4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
