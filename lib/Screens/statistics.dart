@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ui_1/data/utlity.dart';
-import '../data/model/add_date.dart';
+import 'package:ui_1/services/firebase_service.dart';
+
+
 
 class Statistics extends StatefulWidget {
   const Statistics({Key? key}) : super(key: key);
@@ -12,10 +13,21 @@ class Statistics extends StatefulWidget {
 ValueNotifier kj = ValueNotifier(0);
 
 class _StatisticsState extends State<Statistics> {
+  String? distanceFromFirebase;
   List day = ['Outdoor running', 'Treadmill', 'Outdoor cycling', 'Walking'];
-  List f = [today(), week(), month(), year()];
-  List<Add_data> a = [];
   int index_color = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // getSteps jala los pasos que ha dado el usuario
+    getDistance().then((distance) {
+      setState(() {
+        distanceFromFirebase = distance; // Asigna los datos de Firebase a la variable
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +37,7 @@ class _StatisticsState extends State<Statistics> {
           valueListenable: kj,
           builder: (BuildContext context, dynamic value, Widget? child) {
            
-            a = f[value];
+            
             return custom();
           },
         ),
@@ -170,7 +182,7 @@ class _StatisticsState extends State<Statistics> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    '22.2', // Número grande
+                    distanceFromFirebase != null ? distanceFromFirebase! : '🏃‍♂️', // Número grande
                     style: TextStyle(
                       fontSize: 68, // Tamaño grande
                       fontWeight: FontWeight.bold,

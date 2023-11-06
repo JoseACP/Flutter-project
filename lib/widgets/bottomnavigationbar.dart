@@ -12,12 +12,20 @@ class Bottom extends StatefulWidget {
 
 class _BottomState extends State<Bottom> {
   int index_color = 0;
-  List Screen = [Home(), Statistics(), User(), Home(), Statistics(), User()];
+  List<Widget> screens = [Home(), Statistics(), User()];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Screen[index_color],
-     
+      body: AnimatedSwitcher(
+        duration: Duration(milliseconds: 400), // Duración de la animación
+        child: screens[index_color],
+        switchInCurve: Curves.easeInOut, // Curva de entrada
+        switchOutCurve: Curves.easeInOut, // Curva de salida
+        transitionBuilder: (child, animation) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
@@ -50,7 +58,6 @@ class _BottomState extends State<Bottom> {
                   color: index_color == 1 ? Color.fromARGB(255, 137, 84, 54) : Colors.grey,
                 ),
               ),
-              
               GestureDetector(
                 onTap: () {
                   setState(() {

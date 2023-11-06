@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:ui_1/data/model/add_date.dart';
+import 'package:ui_1/services/firebase_service.dart';
 
 
 class Home extends StatefulWidget {
@@ -13,260 +12,266 @@ class Home extends StatefulWidget {
 
 
 class _HomeState extends State<Home> {
-  var history;
-  final box = Hive.box<Add_data>('data');
-  final List<String> day = [
-    'Monday',
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    'friday',
-    'saturday',
-    'sunday'
-  ];
-  
+     String? nameFromFirebase;
+     String? distanceFromFirebase;
+
+   @override
+  void initState() {
+    super.initState();
+
+    // Llama a getName() para obtener los datos de Firebase
+    getName().then((name) {
+      setState(() {
+        nameFromFirebase = name; // Asigna los datos de Firebase a la variable
+      });
+    });
+
+    // getSteps jala los pasos que ha dado el usuario
+    getDistance().then((distance) {
+      setState(() {
+        distanceFromFirebase = distance; // Asigna los datos de Firebase a la variable
+      });
+    });
+  }
+ 
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          child: ValueListenableBuilder(
-              valueListenable: box.listenable(),
-              builder: (context, value, child) {
-                return CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: SizedBox(height: 370, child: _head()),
+          child: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: SizedBox(height: 370, child: _head()),
+              ),
+               SliverToBoxAdapter(
+              child: SizedBox(height: 1), // Espacio vertical entre _head y los títulos
+            ),
+          SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Friends',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 19,
+                        color: Colors.black,
+                      ),
                     ),
-                     SliverToBoxAdapter(
-                    child: SizedBox(height: 1), // Espacio vertical entre _head y los títulos
-                  ),
-                SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Text(
+                      'Friends rating >',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w200,
+                        fontSize: 17,
+                        color: Color.fromARGB(255, 214, 103, 11),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+             SliverToBoxAdapter(
+                child: SizedBox(height: 10), // Espacio vertical entre los títulos y los círculos
+              ),
+           SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: SizedBox(
+                height: 100, // Ajusta la altura del contenedor de círculos y tarjetas
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: friends.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8), // Espacio entre círculos
+                      child: Column(
                         children: [
-                          Text(
-                            'Friends',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                              fontSize: 19,
-                              color: Colors.black,
-                            ),
+                          SizedBox(height: 5), // Ajusta esta altura para mover el contenido hacia abajo
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: AssetImage(friends[index].iconPath),
                           ),
+                          SizedBox(height: 5),
                           Text(
-                            'Friends rating >',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w200,
-                              fontSize: 17,
-                              color: Color.fromARGB(255, 214, 103, 11),
-                            ),
+                            friends[index].name,
+                            style: TextStyle(fontSize: 12),
                           ),
                         ],
                       ),
+                    );
+
+                  },
+                ),
+              ),
+            ),
+          ),
+           SliverToBoxAdapter(
+            child: SizedBox(height: 30), // Espacio vertical entre círculos y las tarjetas de metas
+          ),
+          SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Goals',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 19,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                   SliverToBoxAdapter(
-                      child: SizedBox(height: 10), // Espacio vertical entre los títulos y los círculos
+                    Text(
+                      'Add goal +',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w200,
+                        fontSize: 17,
+                        color: Color.fromARGB(255, 214, 103, 11),
+                      ),
                     ),
-                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: SizedBox(
-                      height: 100, // Ajusta la altura del contenedor de círculos y tarjetas
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: friends.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8), // Espacio entre círculos
-                            child: Column(
-                              children: [
-                                SizedBox(height: 5), // Ajusta esta altura para mover el contenido hacia abajo
-                                CircleAvatar(
-                                  radius: 30,
-                                  backgroundImage: AssetImage(friends[index].iconPath),
-                                ),
-                                SizedBox(height: 5),
-                                Text(
-                                  friends[index].name,
-                                  style: TextStyle(fontSize: 12),
+                  ],
+                ),
+              ),
+            ),
+
+             SliverToBoxAdapter(
+                  child: SizedBox(height: 10), // Espacio vertical entre círculos y las tarjetas de metas
+                ),
+                              
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: SizedBox(
+                height: 150, // Ajusta la altura del contenedor de tus tarjetas de metas
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    // Tarjeta de "Meta Kilos"
+                    Row(
+                      children: [
+                        Container(
+                          height: 120,
+                          width: 180,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 3,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
                                 ),
                               ],
                             ),
-                          );
-
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                 SliverToBoxAdapter(
-                  child: SizedBox(height: 30), // Espacio vertical entre círculos y las tarjetas de metas
-                ),
-                SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Goals',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                              fontSize: 19,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            'Add goal +',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w200,
-                              fontSize: 17,
-                              color: Color.fromARGB(255, 214, 103, 11),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                   SliverToBoxAdapter(
-                        child: SizedBox(height: 10), // Espacio vertical entre círculos y las tarjetas de metas
-                      ),
-                                    
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: SizedBox(
-                      height: 150, // Ajusta la altura del contenedor de tus tarjetas de metas
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          // Tarjeta de "Meta Kilos"
-                          Row(
-                            children: [
-                              Container(
-                                height: 120,
-                                width: 180,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 3,
-                                        blurRadius: 5,
-                                        offset: Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            '70', // Reemplaza con tu meta de peso
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 44,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          Text(
-                                            'kg',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w200,
-                                              fontSize: 24,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Container(
-                                        child: Text(
-                                          'Meta Peso',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 16,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                              SizedBox(width: 16.0), // Espacio horizontal entre los contenedores
-                              Container(
-                                height: 120,
-                                width: 180,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 3,
-                                      blurRadius: 5,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                padding: EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          '70', // Reemplaza con tu meta de peso
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 44,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Text(
-                                          'km',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w200,
-                                            fontSize: 24,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
                                     Text(
-                                      'Meta Kilometro',
+                                      '70', // Reemplaza con tu meta de peso
                                       style: TextStyle(
-                                        fontWeight: FontWeight.w300,
-                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 44,
                                         color: Colors.black,
                                       ),
                                     ),
-                                    
+                                    Text(
+                                      'kg',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w200,
+                                        fontSize: 24,
+                                        color: Colors.black,
+                                      ),
+                                    ),
                                   ],
                                 ),
-                              )
+                                Container(
+                                  child: Text(
+                                    'Meta Peso',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                        SizedBox(width: 16.0), // Espacio horizontal entre los contenedores
+                        Container(
+                          height: 120,
+                          width: 180,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 3,
+                                blurRadius: 5,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          padding: EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    distanceFromFirebase != null ? distanceFromFirebase! : '🏃‍♂️', // Reemplaza con tu meta de peso
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 44,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    ' km',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w200,
+                                      fontSize: 24,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                'Meta Kilometro',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
                               
                             ],
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                
-
+                          ),
+                        )
+                        
+                      ],
+                    )
                   ],
-                );
-              })),
+                ),
+              ),
+            ),
+          ),
+          
+
+            ],
+          )),
     );
   }
 
@@ -306,7 +311,7 @@ Widget _head() {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Goku Supreme',
+                    nameFromFirebase != null ? nameFromFirebase! : 'Loading..',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 23,
