@@ -14,6 +14,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
      String? nameFromFirebase;
      String? distanceFromFirebase;
+     String? ocupationFromFirebase;
+     String? weightFromFirebase;
 
    @override
   void initState() {
@@ -30,6 +32,21 @@ class _HomeState extends State<Home> {
     getDistance().then((distance) {
       setState(() {
         distanceFromFirebase = distance; // Asigna los datos de Firebase a la variable
+      });
+    });
+  
+
+  // getSteps jala los pasos que ha dado el usuario
+    getOcupation().then((ocupation) {
+      setState(() {
+        ocupationFromFirebase = ocupation; // Asigna los datos de Firebase a la variable
+      });
+    });
+
+    // getSteps jala los pasos que ha dado el usuario
+    getWeight().then((weight) {
+      setState(() {
+        weightFromFirebase = weight; // Asigna los datos de Firebase a la variable
       });
     });
   }
@@ -176,7 +193,7 @@ class _HomeState extends State<Home> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      '70', // Reemplaza con tu meta de peso
+                                      weightFromFirebase != null ? weightFromFirebase! : '👾', // Reemplaza con tu meta de peso
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 44,
@@ -195,7 +212,7 @@ class _HomeState extends State<Home> {
                                 ),
                                 Container(
                                   child: Text(
-                                    'Meta Peso',
+                                    'Goal weitgh',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w300,
                                       fontSize: 16,
@@ -249,7 +266,7 @@ class _HomeState extends State<Home> {
                                 ],
                               ),
                               Text(
-                                'Meta Kilometro',
+                                'Goal distance',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w300,
                                   fontSize: 16,
@@ -319,7 +336,7 @@ Widget _head() {
                     ),
                   ),
                   Text(
-                    'Vendedor de carnitas',
+                    ocupationFromFirebase != null ? ocupationFromFirebase! : '🍖',
                     style: TextStyle(
                       fontWeight: FontWeight.w200,
                       fontSize: 17,
@@ -343,7 +360,7 @@ Widget _head() {
             width: 170,
             decoration: BoxDecoration(
               boxShadow: [
-                BoxShadow(
+                const BoxShadow(
                   color: Color.fromRGBO(0, 0, 0, 0.301),
                   offset: Offset(0, 6),
                   blurRadius: 8,
